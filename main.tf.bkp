@@ -1,3 +1,5 @@
+#main.tf for Action TERRAFORM
+
 terraform {
   required_providers {
     github = {
@@ -14,6 +16,25 @@ provider "github" {
 
 data "github_repository" "current_repo" {
   full_name = "Practical-DevOps-GitHub/github-terraform-task-YuriiKosiy"
+}
+
+variable "github_token" {
+  type        = string
+  description = "GitHub Token для Terraform"
+  default     = "" 
+}
+
+variable "pat_token" {
+  type        = string
+  description = "PAT Token для GitHub Actions"
+  default     = "" 
+}
+
+variable "discord_webhook_url" {
+  description = "Discord webhook URL for notifications"
+  type        = string
+  sensitive   = true
+  default     = ""
 }
 
 # Add collaborator
@@ -84,11 +105,21 @@ EOT
   overwrite_on_create = true
 }
 
-# Deploy Key
+resource "tls_private_key" "deploy_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
 resource "github_repository_deploy_key" "deploy_key" {
   repository = data.github_repository.current_repo.name
   title      = "DEPLOY_KEY"
-  key        = file("/home/george/.ssh/sprint9.pub")
+  key        = tls_private_key.deploy_key.public_key_openssh
+  read_only  = false
+}
+
+output "deploy_private_key" {
+  value = tls_private_key.deploy_key.private_key_pem
+  sensitive = true
 }
 
 # Personal Access Token (PAT) для GitHub Actions

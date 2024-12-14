@@ -1,13 +1,13 @@
 variable "github_token" {
   type        = string
   description = "GitHub Token для Terraform"
-  default     = "" 
+  default     = "" # Буде використаний через export
 }
 
 variable "pat_token" {
   type        = string
   description = "PAT Token для GitHub Actions"
-  default     = "" 
+  default     = "" # Буде використаний через export
 }
 
 variable "discord_webhook_url" {
